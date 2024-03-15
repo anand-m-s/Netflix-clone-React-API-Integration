@@ -1,22 +1,52 @@
 import React,{useEffect,useState} from 'react'
 import './Post.css'
 import axios from '../../Axios'
-import {API_KEY} from '../../Constants/Constant'
-function Post() {
-    const [movies,setMovies] = useState([])
+import {imageUrl,API_KEY} from '../../Constants/Constant'
+import YouTube  from 'react-youtube'
+
+
+function Post(props) {
+    
+    const [Movies,setMovies] = useState([])
+    const [urlId,setUrlId]=useState('')
+
     useEffect(()=>{
-        axios.get(`discover/tv?api_key=${API_KEY}&with_networks=213`).then((response)=>{
+        axios.get(props.url).then((response)=>{
             console.log(response.data)
+            setMovies(response.data.results)
         }).catch(err=>{
             alert('NetWork error')
         })
     },[])
+
+    const opts = {
+        height: '390',
+        width: '100%',
+        playerVars: {
+          // https://developers.google.com/youtube/player_parameters
+          autoplay: 1,
+        },
+      };
+    const HandleMovie = (id)=>{
+        console.log(id)
+        axios.get(`/movie/${id}/videos?api_key=${API_KEY}&language=en-US`).then((response)=>{
+            if(response.data.results.length!==0){
+                setUrlId(response.data.results[0])
+            }else{
+                console.log('Empty array')
+            }
+        })
+    }
   return (
    <div className='row'>
-    <h2>Title</h2>
+    <h2 className='text-2xl font-bold'>{props.title}</h2>
         <div className="posters">
-             <img className='poster' src="https://images.squarespace-cdn.com/content/v1/59232e19579fb3fa44a693c2/1589212826160-UM9PEPGOS3OJPR0FJ81X/ke17ZwdGBToddI8pDm48kHZUaJeKzodyg_sXWBMxNTdZw-zPPgdn4jUwVcJE1ZvWQUxwkmyExglNqGp0IvTJZUJFbgE-7XRK3dMEBRBhUpxCBUU7B-_SAG1kGvCwYgmUjQXvn8_OJjtz3K1llMQBa1MPsuSXPSY3X-tgg78M7lI/SKOyqL1qFLIhbK6ho2lB-696x975.jpg?format=1500w" alt="poster" />
+            {Movies.map((obj)=>
+            
+            <img key={obj.id} onClick={()=>HandleMovie(obj.id)} className={props.isSmall ? 'smallPoster' : 'poster'} src={`${imageUrl+obj.backdrop_path}`} alt="poster" />
+            )}
         </div>
+        { urlId && <YouTube opts={opts} videoId={urlId.key} /> }
    </div>
   )
 }

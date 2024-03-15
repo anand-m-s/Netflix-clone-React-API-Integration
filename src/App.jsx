@@ -1,5 +1,5 @@
-import { useState } from 'react'
 
+import{Orginals,Action} from './urls.js'
 import './App.css'
 import Navbar from './Components/Navbar/Navbar.jsx'
 import Banner from './Components/Banner/Banner.jsx'
@@ -9,7 +9,8 @@ function App() {
     <>
     <Navbar/>
     <Banner/>
-    <Post/>
+    <Post url={Orginals} title='Netflix Orginals'/>
+    <Post url={Action} title='Action' isSmall />
     </>
   )
 }
